@@ -4,3 +4,11 @@ version = "0.1.0"
 authors = ["Matthew Foreman <soniceroy@gmail.com>"]
 
 [dependencies]
+
+# cargo build profile
+[profile.dev]
+panic = "abort" # disable stack unwinding on panic
+
+# cargo build --release profile
+[profile.release]
+panic = "abort" # disable stack unwinding on panic
