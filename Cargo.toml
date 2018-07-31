@@ -3,12 +3,16 @@ name = "phil_os"
 version = "0.1.0"
 authors = ["Matthew Foreman <soniceroy@gmail.com>"]
 
+[package.metadata.bootimage]
+default-target = "x86_64-phil_os.json"
+
 [dependencies]
+bootloader_precompiled = "0.2.0"
 
 # cargo build profile
-[profile.dev]
-panic = "abort" # disable stack unwinding on panic
+#[profile.dev]
+#panic = "abort" # disable stack unwinding on panic
 
 # cargo build --release profile
-[profile.release]
-panic = "abort" # disable stack unwinding on panic
+#[profile.release]
+#panic = "abort" # disable stack unwinding on panic
