@@ -12,10 +12,15 @@ extern crate volatile; // avoids erroneous optimization
                        // side effects of writing to screen.
 #[macro_use]
 extern crate lazy_static;
+
 extern crate spin;
+extern crate uart_16550;
 
 #[macro_use]
 mod vga_buffer;
+
+#[macro_use]
+mod serial; // Qemu integration tests using a virtual serial uart
 
 // C runtime zero (crt0) and start
 // are overwritten and our own
@@ -28,7 +33,9 @@ pub extern "C" fn _start() -> ! { // "!" is of the "never" type
                                   // because it never returns
 
     println!("Hello World{}", "!");
+    serial_println!("Hello World{}", "!");
     println!("And I'm outta here...");
+    serial_println!("And I'm outta here...");
     panic!("Zippy canoe!!!");
     loop {}
 }
