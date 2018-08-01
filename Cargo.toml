@@ -8,6 +8,13 @@ default-target = "x86_64-phil_os.json"
 
 [dependencies]
 bootloader_precompiled = "0.2.0"
+volatile = "0.2.3"
+spin = "0.4.6"
+
+[dependencies.lazy_static]
+version = "1.0"
+features = ["spin_no_std"]
+
 
 # cargo build profile
 #[profile.dev]

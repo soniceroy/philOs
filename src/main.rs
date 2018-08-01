@@ -1,38 +1,40 @@
 #![feature(panic_implementation)]
+#![feature(exclusive_range_pattern)] //used in vga_buffer.rs
 #![no_std]
 #![no_main]
 
 use core::panic::PanicInfo;
 extern crate bootloader_precompiled;
+extern crate volatile; // avoids erroneous optimization
+                       // due to compiler not knowing
+                       // the buffer struct has valid
+                       // side effects of writing to screen.
+#[macro_use]
+extern crate lazy_static;
+extern crate spin;
+
+#[macro_use]
+mod vga_buffer;
 
 // C runtime zero (crt0) and start
 // are overwritten and our own
 // _start is written for a new
 // entrypoint
-static HELLO: &[u8] = b"Hello World!";
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! { // "!" is of the "never" type
                                   // because it never returns
 
-    // raw pointer cast to the vga buffer address 0xb8000
-    let vga_buffer = 0xb8000 as *mut u8;
-
-    for (i, &byte) in HELLO.iter().enumerate() {
-        unsafe {
-            // set the char in the VGA buffer to the i-ith HELLO char
-            *vga_buffer.offset(i as isize * 2) = byte;
-            // set the corresponding color to 0xb (light cyan)
-            *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
-        }
-    }
-
+    println!("Hello World{}", "!");
+    println!("And I'm outta here...");
+    panic!("Zippy canoe!!!");
     loop {}
 }
 
 /// This function is called on panic
 #[panic_implementation]
 #[no_mangle]
-pub fn panic(_info: &PanicInfo) -> ! {
+pub fn panic(info: &PanicInfo) -> ! {
+    println!("{}", info);
     loop {}
 }
