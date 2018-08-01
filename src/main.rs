@@ -1,7 +1,8 @@
 #![feature(panic_implementation)]
 #![feature(exclusive_range_pattern)] //used in vga_buffer.rs
 #![no_std]
-#![no_main]
+#![cfg_attr(not(test), no_main)]
+#![cfg_attr(test, allow(dead_code, unused_macros, unused_imports))]
 
 use core::panic::PanicInfo;
 extern crate bootloader_precompiled;
@@ -21,6 +22,7 @@ mod vga_buffer;
 // _start is written for a new
 // entrypoint
 
+#[cfg(not(test))]
 #[no_mangle]
 pub extern "C" fn _start() -> ! { // "!" is of the "never" type
                                   // because it never returns
@@ -32,9 +34,16 @@ pub extern "C" fn _start() -> ! { // "!" is of the "never" type
 }
 
 /// This function is called on panic
+#[cfg(not(test))] // only compile when the test flag is not set
 #[panic_implementation]
 #[no_mangle]
 pub fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
     loop {}
 }
+
+#[cfg(test)]
+extern crate std;
+
+#[cfg(test)]
+extern crate array_init;

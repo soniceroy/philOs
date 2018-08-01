@@ -16,6 +16,10 @@ version = "1.0"
 features = ["spin_no_std"]
 
 
+# to get tests to work
+[dev-dependencies]
+array-init = "0.0.3"
+
 # cargo build profile
 #[profile.dev]
 #panic = "abort" # disable stack unwinding on panic
