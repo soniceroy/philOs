@@ -19,6 +19,7 @@ lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
+        idt.double_fault.set_handler_fn(double_fault_handler);
         idt
     };
 }
@@ -27,28 +28,39 @@ pub fn init_idt() {
     IDT.load();
 }
 
+extern "x86-interrupt" fn double_fault_handler(
+    stack_frame: &mut ExceptionStackFrame, _error_code: u64) {
+
+    println!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
+
+    loop {}
+}
+
+
 extern "x86-interrupt" fn breakpoint_handler(
     stack_frame: &mut ExceptionStackFrame) {
 
     println!("EXCEPTION: BREAKPOINT\n{:?}", stack_frame);
 }
+
 // C runtime zero (crt0) and start
 // are overwritten and our own
 // _start is written for a new
 // linker entrypoint
 #[cfg(not(test))]
 #[no_mangle]
-pub extern "C" fn _start() -> ! { // "!" is of the "never" type
-                                  // because it never returns
-
+pub extern "C" fn _start() -> ! {
     println!("Hello World{}", "!");
 
     init_idt();
 
-    // invoke a breakpoint exception
-    x86_64::instructions::int3();
+    fn stack_overflow() { stack_overflow(); }
+
+    // trigger stack overflow
+    stack_overflow();
 
     println!("It did not crash!");
+
     loop {}
 }
 

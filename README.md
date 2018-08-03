@@ -20,3 +20,4 @@ To run (using qumu) output file:
 To write to usb stick for use on a real machine (assuming in project directory):
     where sdX is the device name:
         'dd if=target/x86_64-phil_os/debug/bootimage.bin of=/dev/sdX && sync'
+
