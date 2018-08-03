@@ -9,6 +9,8 @@
 #[macro_use]
 extern crate phil_os;
 extern crate x86_64;
+
+use phil_os::exit_qemu;
 #[macro_use]
 extern crate lazy_static;
 use x86_64::structures::idt::{InterruptDescriptorTable, ExceptionStackFrame};
@@ -33,9 +35,14 @@ pub fn init_idt() {
 }
 
 extern "x86-interrupt" fn double_fault_handler(
-    stack_frame: &mut ExceptionStackFrame, _error_code: u64) {
+    _stack_frame: &mut ExceptionStackFrame, _error_code: u64) {
 
-    println!("EXCEPTION: DOUBLE FAULT\n{:#?}", stack_frame);
+    serial_println!("ok");
+
+
+    unsafe {
+        exit_qemu();
+    }
 
     loop {}
 }
@@ -64,7 +71,9 @@ pub extern "C" fn _start() -> ! {
     // trigger stack overflow
     stack_overflow();
 
-    println!("It did not crash!");
+    // should not reach because double fault handler should
+    // be triggered.
+    serial_println!("failed");
 
     loop {}
 }
@@ -74,6 +83,11 @@ pub extern "C" fn _start() -> ! {
 #[panic_implementation]
 #[no_mangle]
 pub fn panic(info: &PanicInfo) -> ! {
-    println!("{}", info);
+    serial_println!("failed");
+    serial_println!("{}", info);
+
+    unsafe {
+        exit_qemu();
+    }
     loop {}
 }
